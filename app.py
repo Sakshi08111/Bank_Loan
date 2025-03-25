@@ -59,28 +59,44 @@ except Exception as e:
 st.title('Loan Approval Prediction')
 st.write('Enter the details below to check your loan approval status.')
 
-# Ensure correct feature names and align with model training data
-input_data = pd.DataFrame([[
-    customer_age, family_member, income, loan_amount, cibil_score, tenure,
-    gender, married, education, self_employed, previous_loan_taken,
-    property_area, customer_bandwidth
-]], columns=[
-    'Age', 'Dependents', 'ApplicantIncome', 'LoanAmount', 'Cibil_Score', 'Tenure',
-    'Gender', 'Married', 'Education', 'Self_Employed', 'Previous_Loan_Taken',
-    'Property_Area', 'Customer_Bandwith'  # Ensure correct spelling
-])
+# Input fields
+customer_age = st.number_input('Customer Age', min_value=18, max_value=100, step=1)
+family_member = st.number_input('Family Member', min_value=0, step=1)
+income = st.number_input('Income', min_value=0.0, step=100.0)
+loan_amount = st.number_input('Loan Amount', min_value=0.0, step=100.0)
+cibil_score = st.number_input('Cibil Score', min_value=300, max_value=900, step=1)
+tenure = st.number_input('Tenure (in months)', min_value=6, step=6)
+gender = st.selectbox('Gender', ['Male', 'Female'])
+married = st.selectbox('Married', ['Yes', 'No'])
+education = st.selectbox('Education', ['Graduate', 'Not Graduate'])
+self_employed = st.selectbox('Self Employed', ['Yes', 'No'])
+previous_loan_taken = st.selectbox('Previous Loan Taken', ['Yes', 'No'])
+property_area = st.selectbox('Property Area', ['Urban', 'Semiurban', 'Rural'])
+customer_bandwidth = st.selectbox('Customer Bandwidth', ['Low', 'Medium', 'High'])
 
-# Map categorical data to numeric values (if necessary)
-input_data['Gender'] = input_data['Gender'].map({'Male': 0, 'Female': 1})
-input_data['Married'] = input_data['Married'].map({'Yes': 1, 'No': 0})
-input_data['Education'] = input_data['Education'].map({'Graduate': 1, 'Not Graduate': 0})
-input_data['Self_Employed'] = input_data['Self_Employed'].map({'Yes': 1, 'No': 0})
-input_data['Previous_Loan_Taken'] = input_data['Previous_Loan_Taken'].map({'Yes': 1, 'No': 0})
-input_data['Property_Area'] = input_data['Property_Area'].map({'Urban': 2, 'Semiurban': 1, 'Rural': 0})
-input_data['Customer_Bandwith'] = input_data['Customer_Bandwith'].map({'Low': 0, 'Medium': 1, 'High': 2})
+if st.button('Predict'):
+    if model is not None:
+        try:
+            input_data = pd.DataFrame([[
+                customer_age, family_member, income, loan_amount, cibil_score, tenure,
+                gender, married, education, self_employed, previous_loan_taken,
+                property_area, customer_bandwidth
+            ]], columns=[
+                'Age', 'Dependents', 'ApplicantIncome', 'LoanAmount', 'Cibil_Score', 'Tenure',
+                'Gender', 'Married', 'Education', 'Self_Employed', 'Previous_Loan_Taken',
+                'Property_Area', 'Customer_Bandwith'
+            ])
 
-# Perform prediction
-# Perform prediction
+            # Map categorical data to numeric values
+            input_data['Gender'] = input_data['Gender'].map({'Male': 0, 'Female': 1})
+            input_data['Married'] = input_data['Married'].map({'Yes': 1, 'No': 0})
+            input_data['Education'] = input_data['Education'].map({'Graduate': 1, 'Not Graduate': 0})
+            input_data['Self_Employed'] = input_data['Self_Employed'].map({'Yes': 1, 'No': 0})
+            input_data['Previous_Loan_Taken'] = input_data['Previous_Loan_Taken'].map({'Yes': 1, 'No': 0})
+            input_data['Property_Area'] = input_data['Property_Area'].map({'Urban': 2, 'Semiurban': 1, 'Rural': 0})
+            input_data['Customer_Bandwith'] = input_data['Customer_Bandwith'].map({'Low': 0, 'Medium': 1, 'High': 2})
+
+            # Perform prediction
             prediction = model.predict(input_data)
             result = 'Loan Approved' if prediction[0] == 0 else 'Loan Rejected'
             st.success(result)
