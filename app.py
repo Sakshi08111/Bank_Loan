@@ -28,23 +28,34 @@ def create_connection():
 
 connection = create_connection()
 
-# Load the model safely
-model_path = r"C:\Users\A2Z\Desktop\Cloud\build.pkl"
-if not os.path.exists(model_path):
-    st.error(f"Model file not found at: {model_path}")
-    st.stop()  # Stop the app if the model is not found
-else:
-    try:
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
-        st.success("Model loaded successfully.")
-    except pickle.UnpicklingError:
-        st.error("Error: The model file might be corrupted or not a valid pickle file.")
-        model = None
-    except Exception as e:
-        st.error(f"Error loading model: {e}\n{traceback.format_exc()}")
-        model = None
-
+# Load the model safely - use this instead of your current code
+try:
+    # Try to find the model in several possible locations
+    possible_paths = [
+        "build.pkl",  # Same directory
+        os.path.join(os.path.dirname(__file__), "build.pkl"),  # Next to script
+        r"C:\Users\A2Z\Desktop\Cloud\build.pkl"  # Your original path
+    ]
+    
+    model = None
+    for model_path in possible_paths:
+        if os.path.exists(model_path):
+            try:
+                with open(model_path, 'rb') as f:
+                    model = pickle.load(f)
+                st.success(f"Model loaded successfully from {model_path}")
+                break
+            except Exception as e:
+                st.warning(f"Found model at {model_path} but couldn't load: {e}")
+    
+    if model is None:
+        st.error("Could not find or load model file in any of these locations:\n" + 
+                "\n".join(possible_paths))
+        st.stop()
+        
+except Exception as e:
+    st.error(f"Error loading model: {e}\n{traceback.format_exc()}")
+    st.stop()
 st.title('Loan Approval Prediction')
 st.write('Enter the details below to check your loan approval status.')
 
