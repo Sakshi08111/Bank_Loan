@@ -80,18 +80,10 @@ input_data['Property_Area'] = input_data['Property_Area'].map({'Urban': 2, 'Semi
 input_data['Customer_Bandwith'] = input_data['Customer_Bandwith'].map({'Low': 0, 'Medium': 1, 'High': 2})
 
 # Perform prediction
-try:
-    prediction = model.predict(input_data)
-    result = 'Loan Approved' if prediction[0] == 0 else 'Loan Rejected'
-    st.success(result)
-except Exception as e:
-    st.error(f"Prediction Error: {e}")
-
-
-            if prediction[0] == 1:
-                st.error('Loan is Rejected')
-            else:
-                st.success('Loan is Approved')
+# Perform prediction
+            prediction = model.predict(input_data)
+            result = 'Loan Approved' if prediction[0] == 0 else 'Loan Rejected'
+            st.success(result)
 
             # Save to MySQL
             conn = create_connection()
